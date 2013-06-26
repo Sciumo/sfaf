@@ -1,4 +1,6 @@
-sfaf
+SFAF
 ====
 
-Tools for MCEB Pub 7 or SFAF
+Tools for processing MCEB Pub 7 or SFAF data files.
+
+
