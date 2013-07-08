@@ -1,0 +1,2 @@
+INSERT INTO {{#sql.module}}{{.}}.{{/sql.module}}{{name}} ( {{foreign.key}}, {{index.name}}, {{col.name}} ) 
+VALUES ({{>foreign}},{{>index}}, {{%cols}}{{> column}}{{/cols}} );

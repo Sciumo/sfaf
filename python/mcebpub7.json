@@ -1,0 +1,5 @@
+{
+	"array_subtables" : true,
+	"dbdir" : "./sqlite",
+	"array_template": "list_{{name}}"
+}

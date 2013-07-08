@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+"""Use a SFAF CSV metadata dictionary to parse a SFAF file parameter into Python 
+   dictionary output using callbacks to enable very large files."""
 
 import re
 import csv
@@ -6,22 +8,24 @@ import sys
 import getopt
 import types
 import pprint
+import math
 
 
-_author__ = "Eric Lindahl"
+__author__ = "Eric Lindahl"
 __copyright__ = "Copyright 2012, Sciumo, Inc"
 __credits__ = ["Eric Lindahl"]
 __license__ = "LGPL"
-__version__ = "0.0.1"
+__version__ = "0.0.2"
 __maintainer__ = "Eric Lindahl"
 __email__ = "eric.lindahl.tab@gmail.com"
 __status__ = "Alpha"
 
 
+DEFAULTSFAF="../MCEBPub7.csv"
 Metadata = None
 cur_line = 0
 pp = pprint.PrettyPrinter(indent=4)
-
+LONGOPTIONS = ["format="]
 def integer(s_):
 	"""Parse a string to an Integer or None on error"""
 	try:
@@ -41,7 +45,7 @@ def dmsToDD( dms_ ):
 
 def latI180(dms_):
 	"""Normalize dms_.lat.dec into 180.0 degrees"""
-	lat = Math.floor( dms_['lat']['dec'] + 90.0 )
+	lat = math.floor( dms_['lat']['dec'] + 90.0 )
 	return lat
 
 #Regular expression for DMS
@@ -213,24 +217,25 @@ def parsep7(line_, lastRec, lastRecNum, fmts_):
 			recHandler(lastRec, recNum, recSup, recVal)
 	return rec, lastRec, recNum, False
 
-DEFAULTSFAF="../MCEBPub7.csv"
-
-def read_sfaf_fmts( file_=DEFAULTSFAF, dometa = False ):
+def readSFAFFormats( argv_, file_=DEFAULTSFAF ):
 	"""Read SFAF column format information"""
-#	print "sfaf formats:",file_, "metadata:", dometa
+	optlist, _ = getopt.getopt(argv_, "", LONGOPTIONS)
+	fmtfile = file_
+	for opt,arg in optlist:
+		if opt == "--format":
+			fmtfile=arg
+
 	sfmts={}
-	meta = []
-	with open(file_, 'rbU') as csvfile:
+	with open(fmtfile, 'rbU') as csvfile:
 		fmts = csv.reader(csvfile, dialect='excel', delimiter=',')
 		fmts.next() #skip header
 		for fmt in fmts:
-			meta.append(fmt)
 			code = integer(fmt[0])
 			if code is None:
-				print "Unknown row:",fmt
+				print "Error: Unknown format:",fmt
 			else:
 				sfmts[code] = fmt
-	return sfmts, meta
+	return sfmts
 
 def recprint(recs_,cnt_):
 	"""Print all records"""
@@ -239,7 +244,7 @@ def recprint(recs_,cnt_):
 def readAllRecs( file_, fmts_, batch=1000, callback=recprint ):
 	global cur_line
 	recs = []
-	id = "sfaf:" + file_
+	fileid = "sfaf:" + file_
 	cnt = 1
 	cur_line = 0
 	with open(file_, "rtU") as f:
@@ -250,7 +255,7 @@ def readAllRecs( file_, fmts_, batch=1000, callback=recprint ):
 			rec, lastRec, lastRecNum, isnew = parsep7(line, lastRec, lastRecNum, fmts_)
 			if isnew:
 				#print rec
-				recid = id + "_" + str(cnt)
+				recid = fileid + "_" + str(cnt)
 				lastRec['id'] = recid
 				recs.append( lastRec )
 				cnt = cnt + 1
@@ -263,35 +268,26 @@ def readAllRecs( file_, fmts_, batch=1000, callback=recprint ):
 
 sfaf_fmts = {}
 
-def readSFAF(argv,batch=1000,callback=recprint,metadata=False):
+def readSFAFRecs( argv_, fmts_, callback_=recprint, batch_=1000 ):
+	if len(argv_) < 1:
+		print "no input file. usage 'sfaf [--batch] [--format] inputfile'"
+		return		
+	optlist, _ = getopt.getopt(argv_, "", ["batch="])
+	for opt,arg in optlist:
+		if opt == "--batch":
+			batch_=integer(arg)
+	infile = argv_[0]
+	recs = readAllRecs(infile,fmts_,batch_,callback_)
+	return recs, fmts_
+
+def readSFAF(argv_,callback_=recprint,batch_=1000):
 	"""Read all records from file using SFAF format CSV for column information.
 	Batch the results and call callback every batch records and flush to limit memory.
 	"""
 	cur_line = 0
-	readMeta = False
-	fmtfile = DEFAULTSFAF
-	meta = None
-	optlist, args = getopt.getopt(argv, "", ["format=","metadata"])
-	
-	for opt,arg in optlist:
-		if opt == "--format":
-			print "SFAF Formats:", arg
-			fmtfile=arg
-		elif opt == "--metadata":
-			readMeta = True
-
-	sfaf_fmts, meta = read_sfaf_fmts(fmtfile,metadata)
-	if readMeta:
-		return None, meta
-
-	if len(args) < 1:
-		print "no input file. usage 'sfaf [--format] inputfile'"
-		return
-	infile = args[0]
-#	print "Reading input: ", infile, "Batch:", batch
-	recs = readAllRecs(infile,sfaf_fmts,batch,callback)
-	return recs, meta
+	sfaf_fmts = readSFAFFormats(argv_)
+	return readSFAFRecs( argv_, sfaf_fmts, callback_, batch_ )
 
 	
 if __name__ == "__main__":
-	recs, Metadata = readSFAF(sys.argv[1:],80,callback=recprint)
+	readSFAF(sys.argv[1:])
