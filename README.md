@@ -25,7 +25,13 @@ Usage
 -----
 
 >python sfaf2db.py --dbconf=mcebpub7 ../../data/sfaf_sample_byfreq.txt > sqlite.sql  
-   
+
+This uses the default MCEB CSV configuration file:   
+> DEFAULTSFAF="../MCEBPub7.csv"  
+
+Pass in a '--format=' option to change the format file.    
+>  --format=../mypub7formats.csv
+
 Contents of mcebpub7.json
 > {  
 >   "array_subtables" : true,  
