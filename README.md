@@ -4,7 +4,7 @@ SFAF
 Tools for processing MCEB Pub 7 or SFAF data files.
 
 
-SFAF2SQL
+SFAF2DB
 ========
 
 sfaf2sql uses a Python dictionary mapping tool py2sql with a modified version of   
