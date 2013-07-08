@@ -1,7 +1,7 @@
 SFAF
 ====
 
-Tools for processing MCEB Pub 7 or SFAF data files.
+This SFAF repository is a collection of tools for processing MCEB Pub 7 or SFAF data files.
 * `sfaf.py`  Parses a SFAF file parameter into an array Python dictionaries using a CSV configuration file for mapping SFAF record types.
 * `sfaf2db.py` Uses `sfaf.py` and `py2sql.py` to parse a SFAF file and transform the results into DDL and DML configured by `pystache` moustache templates
 
