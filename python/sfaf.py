@@ -263,6 +263,10 @@ def readAllRecs( file_, fmts_, batch=1000, callback=recprint ):
 				if cnt % batch == 0:
 					callback(recs,cnt)
 					recs = []
+					recid = fileid + "_" + str(cnt)
+		recid = fileid + "_" + str(cnt)
+		lastRec['id'] = recid
+		recs.append( lastRec )
 		callback(recs,cnt)
 	return recs
 
