@@ -9,6 +9,7 @@ import getopt
 import types
 import pprint
 import math
+import json
 
 
 __author__ = "Eric Lindahl"
@@ -90,7 +91,7 @@ def onHandleFreqMulti(rec_,recNum_,recSup_,recVal_):
 	d = band.groups()
 
 	mult = freqMultiple[d[0]]
-	res = str(mult * float(d[1])) + ", " + str(mult * float(d[2]))
+	res = [str(mult * float(d[1])) , str(mult * float(d[2]))]
 	
 	#b = 1
 	#while 	str(recNum_) + "_" + str(b) + "_band" in rec_.keys():
