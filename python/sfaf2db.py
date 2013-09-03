@@ -3,6 +3,9 @@
 import sfaf
 import py2sql
 import sys
+import re
+import types
+import inspect
 
 def cleanargs(list_): return lambda a_: (not (a_[2:a_.find('=')+1] in list_))
 
@@ -23,6 +26,11 @@ for coldef in meta.keys():
 	if col[8] == "TRUE":
 		isarray = True
 	coldefs[coldef] = { 'table': tcol[0], 'attr':str(coldef), 'name' : tcol[1], 'typeinfo' : typeinfo, "IsArray":isarray }
+
+ll = py2sql.LatLon
+llt = inspect.isclass(ll)
+
+coldefs['303_ll'] = { 'table': 'sfaf', 'attr':'303_ll', 'name' : 'tx_coords', 'typeinfo' : py2sql.LatLon, "IsArray": False }
 
 sql = py2sql.Py2SQL(filter(cleanargs(sfaf.LONGOPTIONS),sys.argv[1:]),coldefs)
 

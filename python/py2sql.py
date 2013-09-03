@@ -8,6 +8,7 @@ import json
 import pystache
 import os
 import types
+import inspect
 
 __author__ = "Eric Lindahl"
 __copyright__ = "Copyright 2012, Sciumo, Inc"
@@ -25,6 +26,8 @@ PatName = re.compile("[_a-zA-Z][_a-zA-Z0-9]*$")
 PatKey = re.compile("[_a-zA-Z0-9]+$")
 PatJSON = re.compile(".+\.json$")
 LONGOPTIONS = ["dbconf=","dbdir=","noddl"]
+
+COLTYPES = {}
 
 class Data(object):
 	def __init__(self, sql_, data_):
@@ -48,6 +51,8 @@ class Insert(Data):
 
 def newCol(sql_,col_):
 	typeinfo = col_['typeinfo']
+	if inspect.isclass(typeinfo):
+		return typeinfo(sql_,col_,None)
 	m = PatDouble.match(typeinfo)
 	if m is not None:
 			return Double(sql_,col_,m)
@@ -121,6 +126,17 @@ class String(Column):
 		self.len = matchinfo_.group("len")
 		if self.len is None:
 			self.len = "32"
+
+
+class LatLon(Column):
+	def __init__(self, sql_, data_, matchinfo_):
+		super(LatLon,self).__init__(sql_,data_,matchinfo_)
+		self.name_ddl = self.name + "_lat REAL, " + self.name + "_lon REAL"
+		self.name = self.name + "_lat, " + self.name + "_lon"
+	def value(self):
+		if self.val is not None:
+			return self.val
+		return self.sql.value(self.attr)
 
 class Primary(Column):
 	def __init__(self, sql_, data_, table_):
