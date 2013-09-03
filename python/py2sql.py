@@ -12,8 +12,8 @@ import types
 __author__ = "Eric Lindahl"
 __copyright__ = "Copyright 2012, Sciumo, Inc"
 __credits__ = ["Eric Lindahl"]
-__license__ = "LGPL"
-__version__ = "0.0.1"
+__license__ = "LGPL v3"
+__version__ = "0.0.2"
 __maintainer__ = "Eric Lindahl"
 __email__ = "eric.lindahl.tab@gmail.com"
 __status__ = "Alpha"

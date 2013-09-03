@@ -80,11 +80,11 @@ recHandlers = {}
 #Frequency multiples for normalizing frequency to megahertz 
 freqMultiple = { 'K': 0.001, 'M': 1.0, 'G':1000.0, 'T':1000000.0 }
 
-regCenterF = re.compile("([KMGT])([0-9]+)")
-regBand = re.compile("([KMGT])([0-9]+)\-([KMGT])([0-9]+)")
-regDefBand = re.compile("([KMGT])([0-9]+)\-([0-9]+)")
+regCenterF = re.compile("([KMGT])([\.0-9]+)")
+regBand = re.compile("([KMGT])([\.0-9]+)\-([KMGT])([\.0-9]+)")
+regDefBand = re.compile("([KMGT])([\.0-9]+)\-([\.0-9]+)")
 
-def onHandleFreqMulti(rec_,recNum_,recSup_,recVal_):
+def onHandleFreqMulti(rec_, isArray,recNum_,recSup_,recVal_):
 	band = regDefBand.match(recVal_)
 	if band is None:
 		return None
@@ -97,11 +97,16 @@ def onHandleFreqMulti(rec_,recNum_,recSup_,recVal_):
 	#while 	str(recNum_) + "_" + str(b) + "_band" in rec_.keys():
 	#	b = b + 1
 	#recId = str(recNum_) + "_" + str(b) + "_band"
-	recId = str(recNum_)
-	rec_[recId] = res
+	recId = str(recNum_) + "_band"
+	if isArray:
+		if not recId in rec_.keys():
+			rec_[recId] = []
+		rec_[recId].append(res)
+	else:
+		rec_[recId] = res
 	return res
 	
-def onHandleDouble(rec_,recNum_,recSup_,recVal_):
+def onHandleDouble(rec_, isArray,recNum_,recSup_,recVal_):
 	try:
 		val = float(recVal_)
 		if not val is None:
@@ -112,7 +117,7 @@ def onHandleDouble(rec_,recNum_,recSup_,recVal_):
 		return None
 	return None
 	
-def onHandleFreq(rec_,recNum_,recSup_,recVal_):
+def onHandleFreq(rec_, isArray,recNum_,recSup_,recVal_):
 	band = regBand.match(recVal_)
 	if band is None:
 		band = regDefBand.match(recVal_)
@@ -141,7 +146,7 @@ def onHandleFreq(rec_,recNum_,recSup_,recVal_):
 
 	return res
 	
-def onHandleDMS(rec_,recNum_,recSup_,recVal_):
+def onHandleDMS(rec_, isArray, recNum_,recSup_,recVal_):
 	try:
 		recId = str(recNum_) + "_ll"
 		res = parseDMS(recVal_)
@@ -191,10 +196,10 @@ def parsep7(line_, lastRec, lastRecNum, fmts_):
 	
 	if isArray:
 		recsuplist = []
-		if recNum not in lastRec.keys():
+		if recId not in lastRec.keys():
 			lastRec[recId] = recsuplist
 		else:
-			lastRecVal = lastRec[recNum]
+			lastRecVal = lastRec[recId]
 			if type(lastRecVal) is not list:
 				recsuplist.append( lastRecVal )
 				lastRec[recId] = recsuplist
@@ -215,7 +220,7 @@ def parsep7(line_, lastRec, lastRecNum, fmts_):
 		#print "Rec handler", recNum
 		recHandler = recHandlers[recNum]
 		if type(recHandler) is types.FunctionType:
-			recHandler(lastRec, recNum, recSup, recVal)
+			recHandler(lastRec, isArray, recNum, recSup, recVal)
 	return rec, lastRec, recNum, False
 
 def readSFAFFormats( argv_, file_=DEFAULTSFAF ):
