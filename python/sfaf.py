@@ -83,6 +83,7 @@ freqMultiple = { 'K': 0.001, 'M': 1.0, 'G':1000.0, 'T':1000000.0 }
 regCenterF = re.compile("([KMGT])([\.0-9]+)")
 regBand = re.compile("([KMGT])([\.0-9]+)\-([KMGT])([\.0-9]+)")
 regDefBand = re.compile("([KMGT])([\.0-9]+)\-([\.0-9]+)")
+regRejF = re.compile("([KMGT])([\.0-9]+)\(([\.0-9]+)\)")
 
 def onHandleFreqMulti(rec_, isArray,recNum_,recSup_,recVal_):
 	band = regDefBand.match(recVal_)
@@ -122,12 +123,17 @@ def onHandleFreq(rec_, isArray,recNum_,recSup_,recVal_):
 	if band is None:
 		band = regDefBand.match(recVal_)
 		if band is None:
-			freq = regCenterF.match(recVal_)
+			freq = regRejF.match(recVal_)
 			if freq is None:
-				return None
+				freq = regCenterF.match(recVal_)
+				if freq is None:
+					return None
 			d = freq.groups()
 			recId = str(recNum_) + "_freq"
 			res = freqMultiple[d[0]] * float(d[1])
+			if len(d) > 2:
+				rejRecId = str(recNum_) + "_rej_freq"
+				rec_[rejRecId]= freqMultiple[d[0]] * float(d[2])
 		else:
 			d = band.groups()
 			recId = str(recNum_) + "_band"

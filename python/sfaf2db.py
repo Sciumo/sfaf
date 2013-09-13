@@ -31,6 +31,8 @@ ll = py2sql.LatLon
 llt = inspect.isclass(ll)
 
 coldefs['303_ll'] = { 'table': 'sfaf', 'attr':'303_ll', 'name' : 'tx_coords', 'typeinfo' : py2sql.LatLon, "IsArray": False }
+coldefs['110_rej_freq'] = { 'table': 'sfaf', 'attr':'110_rej_freq', 'name' : 'rejected_freq', 'typeinfo' : py2sql.Double, "IsArray": False }
+coldefs['110_freq'] = { 'table': 'sfaf', 'attr':'110_freq', 'name' : 'assigned_freq', 'typeinfo' : py2sql.Double, "IsArray": False }
 
 sql = py2sql.Py2SQL(filter(cleanargs(sfaf.LONGOPTIONS),sys.argv[1:]),coldefs)
 
