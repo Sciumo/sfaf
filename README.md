@@ -5,7 +5,7 @@ This SFAF repository is a collection of tools for processing MCEB Pub 7 or SFAF 
 * `sfaf.py`  Parses a SFAF file parameter into an array Python dictionaries using a CSV configuration file for mapping SFAF record types.
 * `sfaf2db.py` Uses `sfaf.py` and `py2sql.py` to parse a SFAF file and transform the results into DDL and DML configured by `pystache` moustache templates
 
-These SFAF tools demonstrates the concept of `Convetion over Configuration over Code` design approach through the use of JSON, CSV, and Templating.  
+These SFAF tools demonstrates the concept of `Convention over Configuration over Code` design approach through the use of JSON, CSV, and Templating.  
 Like the Spring `Configuration over Code`approach, this approach focuses on externalizing all configuration outside of code to reuse/redeploy using configuration only.  
 In addtion, like the `Convention over Configuration` design approach, there is only a loose coupling between code structure and configuration.   
 
